@@ -1,6 +1,8 @@
 package com.recettes.Recettes.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,7 +19,13 @@ public class Ingredient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String libelle;
-    private enum Type {
+    
+    @Enumerated(EnumType.STRING)
+    private Type type;
+    
+    private Integer nombreCalorique;
+    
+    public enum Type {
         VIANDE,
         FRUIT,
         LEGUME,
@@ -25,6 +33,4 @@ public class Ingredient {
         BOISSON,
         AUTRE
     }
-    private Type type;
-    private Integer nombreCalorique;
 }
