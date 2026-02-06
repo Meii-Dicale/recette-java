@@ -20,7 +20,7 @@ public class Ingredient {
     private Long id;
     private String libelle;
     
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private Type type;
     
     private Integer nombreCalorique;

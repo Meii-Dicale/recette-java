@@ -1,0 +1,1213 @@
+{
+	"info": {
+		"_postman_id": "recettes-api-collection",
+		"name": "API Recettes - Collection Complète",
+		"description": "Collection Postman pour tester l'API de gestion de recettes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentification",
+			"item": [
+				{
+					"name": "Register - Créer un utilisateur",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has user data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('mail');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nom\": \"Dupont\",\n    \"prenom\": \"Jean\",\n    \"role\": \"USER\",\n    \"password\": \"password123\",\n    \"telephone\": \"0612345678\",\n    \"mail\": \"jean.dupont@email.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Créer un nouvel utilisateur"
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Se connecter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('token');",
+									"    ",
+									"    // Sauvegarder le token et les informations utilisateur",
+									"    if (jsonData.token) {",
+									"        pm.environment.set(\"jwt_token\", jsonData.token);",
+									"    }",
+									"    if (jsonData.userId) {",
+									"        pm.environment.set(\"user_id\", jsonData.userId);",
+									"    }",
+									"    if (jsonData.role) {",
+									"        pm.environment.set(\"user_role\", jsonData.role);",
+									"        console.log(\"Rôle utilisateur: \" + jsonData.role);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mail\": \"jean.dupont@email.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Se connecter et obtenir un token JWT"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints d'authentification"
+		},
+		{
+			"name": "Recettes",
+			"item": [
+				{
+					"name": "Créer une recette",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has recette data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('nom');",
+									"    ",
+									"    // Sauvegarder l'ID de la recette",
+									"    if (jsonData.id) {",
+									"        pm.environment.set(\"recette_id\", jsonData.id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nom\": \"Tarte aux pommes\",\n    \"dureePreparation\": 30,\n    \"dureeCuisson\": 45,\n    \"nombreCalorique\": 250,\n    \"partage\": true,\n    \"userId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/recettes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes"
+							]
+						},
+						"description": "Créer une nouvelle recette"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtenir toutes les recettes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/recettes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes"
+							]
+						},
+						"description": "Récupérer toutes les recettes"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtenir les recettes publiques",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recettes/public",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes",
+								"public"
+							]
+						},
+						"description": "Récupérer les recettes partagées (publiques)"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtenir les recettes d'un utilisateur",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/recettes/user/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes",
+								"user",
+								"1"
+							]
+						},
+						"description": "Récupérer les recettes d'un utilisateur spécifique"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtenir une recette par ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has recette data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('nom');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/recettes/{{recette_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes",
+								"{{recette_id}}"
+							]
+						},
+						"description": "Récupérer une recette par son ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Modifier une recette",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nom\": \"Tarte aux pommes améliorée\",\n    \"dureePreparation\": 35,\n    \"dureeCuisson\": 50,\n    \"nombreCalorique\": 280,\n    \"partage\": true,\n    \"userId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/recettes/{{recette_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes",
+								"{{recette_id}}"
+							]
+						},
+						"description": "Modifier une recette existante"
+					},
+					"response": []
+				},
+				{
+					"name": "Supprimer une recette",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/recettes/{{recette_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes",
+								"{{recette_id}}"
+							]
+						},
+						"description": "Supprimer une recette"
+					},
+					"response": []
+				},
+				{
+					"name": "Ajouter une recette aux favoris",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/recettes/{{recette_id}}/favorites/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes",
+								"{{recette_id}}",
+								"favorites",
+								"1"
+							]
+						},
+						"description": "Ajouter une recette aux favoris d'un utilisateur"
+					},
+					"response": []
+				},
+				{
+					"name": "Retirer une recette des favoris",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/recettes/{{recette_id}}/favorites/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes",
+								"{{recette_id}}",
+								"favorites",
+								"1"
+							]
+						},
+						"description": "Retirer une recette des favoris d'un utilisateur"
+					},
+					"response": []
+				},
+				{
+					"name": "Exporter une recette en PDF",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is PDF\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recettes/{{recette_id}}/export/pdf",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes",
+								"{{recette_id}}",
+								"export",
+								"pdf"
+							]
+						},
+						"description": "Exporter une recette en format PDF"
+					},
+					"response": []
+				},
+				{
+					"name": "Exporter une recette en XLSX",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is XLSX\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"spreadsheetml\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recettes/{{recette_id}}/export/xlsx",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recettes",
+								"{{recette_id}}",
+								"export",
+								"xlsx"
+							]
+						},
+						"description": "Exporter une recette en format XLSX"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des recettes"
+		},
+		{
+			"name": "Ingrédients",
+			"item": [
+				{
+					"name": "Créer un ingrédient",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has ingredient data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    ",
+									"    // Sauvegarder l'ID de l'ingrédient",
+									"    if (jsonData.id) {",
+									"        pm.environment.set(\"ingredient_id\", jsonData.id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"libelle\": \"Pomme\",\n    \"type\": \"FRUIT\",\n    \"nombreCalorique\": 52\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ingredients",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ingredients"
+							]
+						},
+						"description": "Créer un nouvel ingrédient. Types possibles: VIANDE, FRUIT, LEGUME, EPICE, BOISSON, AUTRE"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtenir tous les ingrédients",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ingredients",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ingredients"
+							]
+						},
+						"description": "Récupérer tous les ingrédients"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtenir un ingrédient par ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ingredients/{{ingredient_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ingredients",
+								"{{ingredient_id}}"
+							]
+						},
+						"description": "Récupérer un ingrédient par son ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Modifier un ingrédient",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"libelle\": \"Pomme Golden\",\n    \"type\": \"FRUIT\",\n    \"nombreCalorique\": 55\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ingredients/{{ingredient_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ingredients",
+								"{{ingredient_id}}"
+							]
+						},
+						"description": "Modifier un ingrédient existant"
+					},
+					"response": []
+				},
+				{
+					"name": "Supprimer un ingrédient",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ingredients/{{ingredient_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ingredients",
+								"{{ingredient_id}}"
+							]
+						},
+						"description": "Supprimer un ingrédient"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des ingrédients"
+		},
+		{
+			"name": "Ingrédients par Recette",
+			"item": [
+				{
+					"name": "Créer un ingrédient pour une recette",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has ingredient par recette data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    ",
+									"    // Sauvegarder l'ID",
+									"    if (jsonData.id) {",
+									"        pm.environment.set(\"ingredient_par_recette_id\", jsonData.id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"recetteId\": 1,\n    \"ingredientId\": 1,\n    \"quantite\": 500\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ingredient-par-recette",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ingredient-par-recette"
+							]
+						},
+						"description": "Associer un ingrédient à une recette avec une quantité"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtenir les ingrédients d'une recette",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ingredient-par-recette/recette/{{recette_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ingredient-par-recette",
+								"recette",
+								"{{recette_id}}"
+							]
+						},
+						"description": "Récupérer tous les ingrédients d'une recette spécifique"
+					},
+					"response": []
+				},
+				{
+					"name": "Supprimer un ingrédient d'une recette",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ingredient-par-recette/{{ingredient_par_recette_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ingredient-par-recette",
+								"{{ingredient_par_recette_id}}"
+							]
+						},
+						"description": "Supprimer l'association d'un ingrédient à une recette"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des ingrédients associés aux recettes"
+		},
+		{
+			"name": "Utilisateurs",
+			"item": [
+				{
+					"name": "Obtenir tous les utilisateurs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Récupérer tous les utilisateurs"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtenir un utilisateur par ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						},
+						"description": "Récupérer un utilisateur par son ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Modifier un utilisateur",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nom\": \"Martin\",\n    \"prenom\": \"Pierre\",\n    \"role\": \"USER\",\n    \"password\": \"nouveauPassword123\",\n    \"telephone\": \"0698765432\",\n    \"mail\": \"pierre.martin@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						},
+						"description": "Modifier un utilisateur existant"
+					},
+					"response": []
+				},
+				{
+					"name": "Supprimer un utilisateur",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						},
+						"description": "Supprimer un utilisateur"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des utilisateurs"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Vérifier que le token JWT est présent pour les requêtes authentifiées",
+					"const url = pm.request.url.toString();",
+					"const requiresAuth = !url.includes('/api/auth/') && !url.includes('/public') && !url.includes('/export/');",
+					"",
+					"if (requiresAuth && !pm.environment.get('jwt_token')) {",
+					"    console.warn('ATTENTION: Cette requête nécessite une authentification. Exécutez d\\'abord la requête Login.');",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Détection et débogage des erreurs 403",
+					"if (pm.response.code === 403) {",
+					"    console.error('❌ ERREUR 403 FORBIDDEN');",
+					"    console.log('URL: ' + pm.request.url.toString());",
+					"    console.log('Méthode: ' + pm.request.method);",
+					"    ",
+					"    const token = pm.environment.get('jwt_token');",
+					"    const userRole = pm.environment.get('user_role');",
+					"    ",
+					"    if (!token) {",
+					"        console.error('⚠️  Aucun token JWT trouvé. Exécutez d\\'abord la requête Login.');",
+					"    } else {",
+					"        console.log('✓ Token JWT présent');",
+					"    }",
+					"    ",
+					"    if (userRole) {",
+					"        console.log('Rôle utilisateur: ' + userRole);",
+					"        console.log('⚠️  Vérifiez que votre rôle (' + userRole + ') a les permissions nécessaires pour cet endpoint.');",
+					"    }",
+					"    ",
+					"    console.log('💡 Solutions possibles:');",
+					"    console.log('   1. Vérifiez que vous êtes connecté avec un compte ayant les bonnes permissions');",
+					"    console.log('   2. Vérifiez que le rôle dans la base de données est en majuscules (USER, ADMIN)');",
+					"    console.log('   3. Vérifiez que le token JWT n\\'est pas expiré');",
+					"    console.log('   4. Réessayez en vous reconnectant (requête Login)');",
+					"}",
+					"",
+					"// Détection des erreurs 401",
+					"if (pm.response.code === 401) {",
+					"    console.error('❌ ERREUR 401 UNAUTHORIZED');",
+					"    console.log('Token JWT manquant ou invalide. Exécutez la requête Login pour obtenir un nouveau token.');",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "recette_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "ingredient_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "ingredient_par_recette_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_role",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

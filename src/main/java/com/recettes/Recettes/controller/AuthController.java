@@ -28,6 +28,7 @@ public class AuthController {
     
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        System.out.println("🔐 AuthController.login appelé pour: " + loginRequest.getMail());
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 }

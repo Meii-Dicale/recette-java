@@ -26,6 +26,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        boolean shouldSkip = path.startsWith("/api/auth/") 
+            || path.matches("/api/recettes/\\d+/export/(pdf|xlsx)")
+            || path.startsWith("/api/recettes/public/");
+        
+        if (shouldSkip) {
+            System.out.println("🔓 JwtAuthenticationFilter: Ignoré pour " + path);
+        } else {
+            System.out.println("🔒 JwtAuthenticationFilter: Traitement pour " + path);
+        }
+        
+        return shouldSkip;
+    }
+    
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,

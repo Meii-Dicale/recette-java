@@ -21,10 +21,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User userEntity = userRepo.findByMail(mail)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with mail: " + mail));
         
+        // Normaliser le rôle en majuscules pour garantir la cohérence
+        String role = userEntity.getRole() != null ? userEntity.getRole().toUpperCase() : "USER";
+        
         return org.springframework.security.core.userdetails.User.builder()
             .username(userEntity.getMail())
             .password(userEntity.getPassword())
-            .roles(userEntity.getRole())
+            .roles(role) // La méthode .roles() ajoute automatiquement le préfixe "ROLE_"
             .build();
     }
 }
